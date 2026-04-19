@@ -1,8 +1,14 @@
 import streamlit as st
 import os
+import streamlit as st
+import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain.agents import create_tool_calling_agent, AgentExecutor
+# Bu kısım kritik:
+try:
+    from langchain.agents import create_tool_calling_agent, AgentExecutor
+except ImportError:
+    st.error("Kütüphane sürümü hala eski! Lütfen 'Reboot' yapın veya uygulamayı silip tekrar kurun.")
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # 1. API ANAHTARLARI (Senin paylaştığın güncel anahtarlar)
