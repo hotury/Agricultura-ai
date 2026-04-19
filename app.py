@@ -2,95 +2,89 @@ import streamlit as st
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools.tavily_search import TavilySearchResults
-# Bu kısım kritik:
-try:
-    from langchain.agents import create_tool_calling_agent, AgentExecutor
-except ImportError:
-    st.error("Kütüphane sürümü hala eski! Lütfen 'Reboot' yapın veya uygulamayı silip tekrar kurun.")
+from langchain.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-# 1. API ANAHTARLARI (Senin paylaştığın güncel anahtarlar)
-os.environ["GOOGLE_API_KEY"] = "AIzaSyB5yID-D8b12oaDR9gciXyVVRf59juNa_c"
-os.environ["TAVILY_API_KEY"] = "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"
+# 1. API ANAHTARLARI (Senin verdiğin güncel anahtarlar)
+os.environ["AIzaSyB5yID-D8b12oaDR9gciXyVVRf59juNa_c"] = "AIzaSyB5yID-D8b12oaDR9gciXyVVRf59juNa_c"
+os.environ["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"] = "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"
 
-# 2. SAYFA AYARLARI VE GÖRSEL TASARIM
+# 2. SAYFA TASARIMI
 st.set_page_config(page_title="AgriResearch AI", page_icon="🌱", layout="centered")
 
 st.markdown("""
 <style>
     .report-card {
         background-color: #ffffff;
-        border-left: 6px solid #2e7d32;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        color: #2c3e50;
+        border-left: 8px solid #2e7d32;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: #1a3a1a;
         line-height: 1.6;
     }
     .stButton > button {
         background-color: #2e7d32;
         color: white;
-        height: 3em;
-        border-radius: 10px;
+        font-weight: bold;
+        border-radius: 8px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. ARAŞTIRMACI AJAN KURULUMU
-def asistan_hazirla():
-    # Gemini 1.5 Flash: Hızlı ve cömert ücretsiz kota kullanımı
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
+# 3. ARAŞTIRMA AJANI KURULUMU
+def agent_kur():
+    # Gemini 1.5 Flash: Hızlı ve akademik kapasitesi yüksek
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.1)
     
-    # Tavily Search: Gelişmiş akademik arama modu
+    # Tavily: Bilimsel derinlik için gelişmiş arama modu
     search_tool = TavilySearchResults(max_results=5, search_depth="advanced")
     tools = [search_tool]
 
-    # Sistem Talimatı (Prompt)
+    # Akademik ve Pratik Odaklı Prompt
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """Sen kıdemli bir Ziraat Mühendisi ve Akademik Araştırmacısın. 
-        Görevin: Kullanıcının sorusunu bilimsel makaleler ve güncel tarım raporları üzerinden taramak.
+        ("system", """Sen kıdemli bir Ziraat Mühendisi ve Bilimsel Araştırmacısın. 
+        Görevin: Kullanıcının sorusunu Tavily aracını kullanarak akademik makalelerden araştırmak.
         
-        Yanıt Yapısı:
-        - **🔬 Bilimsel Analiz**: Konuyla ilgili akademik bulgular.
-        - **🚜 Saha Önerileri**: Çiftçiler için pratik uygulama adımları.
-        - **📚 Kaynakça**: Yararlanılan makale linkleri.
+        Rapor Yapısı:
+        - **🔬 Akademik Analiz**: En son bilimsel bulgular ve genetik/botanik veriler.
+        - **🚜 Saha Uygulama Planı**: Çiftçinin veya işletmenin yapması gereken pratik adımlar.
+        - **📚 Bilimsel Kaynakça**: Yararlanılan makalelerin linkleri.
         
-        Dilin profesyonel, güvenilir ve anlaşılır olsun."""),
+        Not: Sadece doğrulanmış tarımsal kaynakları baz al."""),
         ("human", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ])
 
-    # Ajanı oluşturma
+    # Ajanı oluştur
     agent = create_tool_calling_agent(llm, tools, prompt)
     return AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
 
-# 4. KULLANICI ARAYÜZÜ
+# 4. ARAYÜZ AKIŞI
 st.title("🌱 AgriResearch AI")
-st.write("Akademik verileri tarla pratiklerine dönüştüren otonom araştırma sistemi.")
+st.write("Akademik verileri otonom olarak tarayan ve teknik rapor hazırlayan tarım asistanı.")
 
-user_input = st.text_area("Araştırmak istediğiniz tarımsal konuyu yazın:", 
-                          placeholder="Örn: Domateste Ty-1 geninin virüs direncine etkisi...", height=120)
+soru = st.text_area("Araştırmak istediğiniz teknik konuyu yazın:", 
+                    placeholder="Örn: Domateste Ty-1 geninin virüs direnci üzerindeki etkisi...", height=120)
 
-if st.button("Analizi Başlat", use_container_width=True):
-    if user_input.strip():
-        with st.status("🔍 Veriler işleniyor...", expanded=True) as status:
+if st.button("Bilimsel Analizi Başlat", use_container_width=True):
+    if soru.strip():
+        with st.status("🔍 Bilimsel veritabanları taranıyor...", expanded=True) as status:
             try:
-                st.write("📡 Akademik kaynaklar taranıyor (Tavily)...")
-                agent_executor = asistan_hazirla()
+                st.write("📡 Tavily API ile makaleler taranıyor...")
+                executor = agent_kur()
                 
-                st.write("🧠 Gemini 1.5 Flash verileri analiz ediyor...")
-                response = agent_executor.invoke({"input": user_input})
+                st.write("🧠 Gemini 1.5 Flash verileri sentezliyor...")
+                cevap = executor.invoke({"input": soru})
                 
-                status.update(label="✅ Analiz Tamamlandı!", state="complete", expanded=False)
+                status.update(label="✅ Analiz Hazır!", state="complete", expanded=False)
                 
-                # Şık rapor çıktısı
-                st.markdown(f'<div class="report-card"><h3>📋 Araştırma Raporu</h3>{response["output"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="report-card"><h3>📋 Teknik Araştırma Raporu</h3>{cevap["output"]}</div>', unsafe_allow_html=True)
             
             except Exception as e:
-                status.update(label="❌ Hata oluştu", state="error")
-                st.error(f"Sistem bir hata ile karşılaştı: {str(e)}")
+                st.error(f"Sistem hatası: {str(e)}")
     else:
-        st.warning("Lütfen bir soru veya konu başlığı girin.")
+        st.warning("Lütfen bir soru girin.")
 
 st.markdown("---")
-st.caption("Bu sistem Gemini 1.5 Flash ve Tavily AI altyapısını kullanmaktadır.")
+st.caption("Altyapı: Gemini 1.5 Flash & Tavily Research AI")
