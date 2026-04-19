@@ -15,8 +15,8 @@ st.title("🌱 AgriResearch AI")
 
 # 3. ARAŞTIRMA AJANI FONKSİYONU
 def arastirma_yap(soru):
-    # Model ismini 'gemini-1.5-flash' yerine 'models/gemini-1.5-flash' 
-    # veya sadece 'gemini-1.5-flash' olarak kütüphanenin en güncel haliyle deniyoruz.
+    # DİKKAT: Burada model ismini en yalın haliyle veriyoruz.
+    # Eğer hata devam ederse model="gemini-pro" olarak değiştirip stabiliteyi test edebilirsin.
     llm = ChatGoogleGenerativeAI(
         model="gemini-1.5-flash", 
         google_api_key=G_KEY,
@@ -47,7 +47,9 @@ if st.button("Analiz Et"):
                 res = arastirma_yap(query)
                 st.markdown(f"### Rapor\n{res['output']}")
             except Exception as e:
-                # Eğer hala 404 verirse, model ismini otomatik düzelten bir hata mesajı gösterelim
+                # Hata 404 ise alternatif modeli dene uyarısı verelim
+                if "404" in str(e):
+                    st.error("Google API modeli bulamadı. Lütfen koddaki model ismini 'gemini-pro' yaparak tekrar deneyin.")
                 st.error(f"Hata detayı: {str(e)}")
     else:
         st.warning("Lütfen bir soru girin.")
