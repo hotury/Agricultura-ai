@@ -1,6 +1,6 @@
 streamlit==1.32.0
 langchain==0.1.16
-langchain-community==0.0.32
-langchain-google-genai==1.0.2
-langchain-core==0.1.42
+langchain-google-genai==1.0.3
+langchain-community==0.0.34
+langchain-core==0.1.45
 tavily-python==0.3.3
