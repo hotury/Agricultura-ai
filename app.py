@@ -24,10 +24,17 @@ def arastirma_yap(soru):
     search = TavilySearch(max_results=3)
     arama_sonucu = search.invoke(soru)
 
-    context = "\n\n".join([
-        f"Kaynak: {r.get('url','')}\n{r.get('content','')}"
-        for r in arama_sonucu
-    ])
+    # Sonuç string mi liste mi kontrol et
+    if isinstance(arama_sonucu, str):
+        context = arama_sonucu
+    elif isinstance(arama_sonucu, list):
+        context = "\n\n".join([
+            f"Kaynak: {r.get('url','')}\n{r.get('content','')}"
+            if isinstance(r, dict) else str(r)
+            for r in arama_sonucu
+        ])
+    else:
+        context = str(arama_sonucu)
 
     prompt = f"""Sen uzman bir ziraat mühendisisin.
 Aşağıdaki araştırma sonuçlarını kullanarak soruyu Türkçe yanıtla ve kaynak ver.
