@@ -1,6 +1,6 @@
 streamlit
-langchain
-langchain-openai
-langchain-community
-langchain-core
+langchain==0.3.25
+langchain-openai==0.3.16
+langchain-community==0.3.24
+langchain-core==0.3.58
 tavily-python
