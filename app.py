@@ -1,12 +1,11 @@
 import streamlit as st
 import os
-from langchain_openai import ChatOpenAI
+from groq import Groq
 from langchain_tavily import TavilySearch
-from langchain_core.messages import HumanMessage
 
 # 1. API ANAHTARLARI
 os.environ["TAVILY_API_KEY"] = "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"
-OPENROUTER_API_KEY = "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"
+GROQ_API_KEY = "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"
 
 # 2. SAYFA TASARIMI
 st.set_page_config(page_title="AgriResearch AI", page_icon="🌱")
@@ -14,17 +13,10 @@ st.title("🌱 AgriResearch AI")
 
 # 3. ARAŞTIRMA FONKSİYONU
 def arastirma_yap(soru):
-    llm = ChatOpenAI(
-        model="mistralai/mistral-7b-instruct:free",
-        api_key=OPENROUTER_API_KEY,
-        base_url="https://openrouter.ai/api/v1",
-        temperature=0.2
-    )
-
+    # Tavily ile ara
     search = TavilySearch(max_results=3)
     arama_sonucu = search.invoke(soru)
 
-    # Sonuç string mi liste mi kontrol et
     if isinstance(arama_sonucu, str):
         context = arama_sonucu
     elif isinstance(arama_sonucu, list):
@@ -46,8 +38,14 @@ Araştırma Sonuçları:
 
 Yanıt:"""
 
-    yanit = llm.invoke([HumanMessage(content=prompt)])
-    return yanit.content
+    # Groq ile yanıt üret
+    client = Groq(api_key=GROQ_API_KEY)
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2
+    )
+    return response.choices[0].message.content
 
 # 4. ARAYÜZ
 query = st.text_input("Araştırmak istediğiniz konu:")
