@@ -7,7 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # 1. API ANAHTARLARI
 G_KEY = "AIzaSyB5yID-D8b12oaDR9gciXyVVRf59juNa_c"
-T_KEY = "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"
+T_KEY = "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"
 
 # 2. SAYFA TASARIMI
 st.set_page_config(page_title="AgriResearch AI", page_icon="🌱")
