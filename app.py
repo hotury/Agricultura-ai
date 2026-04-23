@@ -16,7 +16,7 @@ st.title("🌱 AgriResearch AI")
 # 3. ARAŞTIRMA AJANI FONKSİYONU
 def arastirma_yap(soru):
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model="gemini-2.0-flash",
         temperature=0.2
     )
 
