@@ -2,8 +2,8 @@ import streamlit as st
 import os
 from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.agents import AgentExecutor, create_openai_tools_agent
 
 # 1. API ANAHTARLARI
 os.environ["TAVILY_API_KEY"] = "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"
@@ -31,7 +31,7 @@ def arastirma_yap(soru):
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ])
 
-    agent = create_tool_calling_agent(llm, tools, prompt)
+    agent = create_openai_tools_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
 
     return agent_executor.invoke({"input": soru})
