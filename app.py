@@ -1,13 +1,13 @@
 import streamlit as st
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-# 1. API ANAHTARLARI — ortam değişkeni olarak set et (şart!)
-os.environ["GOOGLE_API_KEY"] = "AIzaSyB5yID-D8b12oaDR9gciXyVVRf59juNa_c"
+# 1. API ANAHTARLARI
 os.environ["TAVILY_API_KEY"] = "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"
+OPENROUTER_API_KEY = "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"
 
 # 2. SAYFA TASARIMI
 st.set_page_config(page_title="AgriResearch AI", page_icon="🌱")
@@ -15,8 +15,10 @@ st.title("🌱 AgriResearch AI")
 
 # 3. ARAŞTIRMA AJANI FONKSİYONU
 def arastirma_yap(soru):
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+    llm = ChatOpenAI(
+        model="mistralai/mistral-7b-instruct:free",
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1",
         temperature=0.2
     )
 
@@ -44,8 +46,6 @@ if st.button("Analiz Et"):
                 res = arastirma_yap(query)
                 st.markdown(f"### Rapor\n{res['output']}")
             except Exception as e:
-                if "404" in str(e):
-                    st.error("Google API modeli bulamadı. Model ismini 'gemini-pro' yaparak tekrar deneyin.")
                 st.error(f"Hata detayı: {str(e)}")
     else:
         st.warning("Lütfen bir soru girin.")
