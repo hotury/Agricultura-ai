@@ -1,19 +1,18 @@
 import streamlit as st
 import os
 from langchain_openai import ChatOpenAI
-from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_tavily import TavilySearch
 from langchain_core.messages import HumanMessage
 
 # 1. API ANAHTARLARI
 os.environ["TAVILY_API_KEY"] = "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"
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 # 2. SAYFA TASARIMI
 st.set_page_config(page_title="AgriResearch AI", page_icon="🌱")
 st.title("🌱 AgriResearch AI")
 
-# 3. ARAŞTIRMA FONKSİYONU (agent yerine direkt tool_call)
+# 3. ARAŞTIRMA FONKSİYONU
 def arastirma_yap(soru):
     llm = ChatOpenAI(
         model="mistralai/mistral-7b-instruct:free",
@@ -22,12 +21,9 @@ def arastirma_yap(soru):
         temperature=0.2
     )
 
-    search = TavilySearchResults(max_results=3)
-
-    # Önce Tavily ile ara
+    search = TavilySearch(max_results=3)
     arama_sonucu = search.invoke(soru)
 
-    # Sonuçları LLM'e ver
     context = "\n\n".join([
         f"Kaynak: {r.get('url','')}\n{r.get('content','')}"
         for r in arama_sonucu
